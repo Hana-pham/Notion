@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Calendar</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .event {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Calendar</h1>
+    <div id="calendar"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.4.0/ical.min.js"></script>
+    <script>
+        fetch('../hana-calendar.ics')
+            .then(response => response.text())
+            .then(data => {
+                const jcalData = ICAL.parse(data);
+                const comp = new ICAL.Component(jcalData);
+                const events = comp.getAllSubcomponents('vevent');
+                const calendarDiv = document.getElementById('calendar');
+
+                events.forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.classList.add('event');
+
+                    const summary = event.getFirstPropertyValue('summary');
+                    const dtstart = event.getFirstPropertyValue('dtstart').toJSDate();
+                    const dtend = event.getFirstPropertyValue('dtend').toJSDate();
+
+                    eventDiv.innerHTML = `<strong>${summary}</strong><br>
+                                          From: ${dtstart}<br>
+                                          To: ${dtend}`;
+                    calendarDiv.appendChild(eventDiv);
+                });
+            });
+    </script>
+</body>
+</html>
